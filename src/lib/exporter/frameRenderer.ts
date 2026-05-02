@@ -14,10 +14,9 @@ import type {
 	SpeedRegion,
 	WebcamLayoutPreset,
 	WebcamSizePreset,
-	ZoomDepth,
 	ZoomRegion,
 } from "@/components/video-editor/types";
-import { ZOOM_DEPTH_SCALES } from "@/components/video-editor/types";
+import { getZoomScale } from "@/components/video-editor/types";
 import {
 	AUTO_FOLLOW_RAMP_DISTANCE,
 	AUTO_FOLLOW_SMOOTHING_FACTOR,
@@ -30,7 +29,7 @@ import {
 	adaptiveSmoothFactor,
 	smoothCursorFocus,
 } from "@/components/video-editor/videoPlayback/cursorFollowUtils";
-import { clampFocusToStage as clampFocusToStageUtil } from "@/components/video-editor/videoPlayback/focusUtils";
+import { clampFocusToScale } from "@/components/video-editor/videoPlayback/focusUtils";
 import { findDominantRegion } from "@/components/video-editor/videoPlayback/zoomRegionUtils";
 import {
 	applyZoomTransform,
@@ -505,14 +504,6 @@ export class FrameRenderer {
 		};
 	}
 
-	private clampFocusToStage(
-		focus: { cx: number; cy: number },
-		depth: ZoomDepth,
-	): { cx: number; cy: number } {
-		if (!this.layoutCache) return focus;
-		return clampFocusToStageUtil(focus, depth, this.layoutCache.stageSize);
-	}
-
 	private updateAnimationState(timeMs: number): number {
 		if (!this.cameraContainer || !this.layoutCache) return 0;
 
@@ -528,8 +519,8 @@ export class FrameRenderer {
 		let targetProgress = 0;
 
 		if (region && strength > 0) {
-			const zoomScale = blendedScale ?? ZOOM_DEPTH_SCALES[region.depth];
-			const regionFocus = this.clampFocusToStage(region.focus, region.depth);
+			const zoomScale = blendedScale ?? getZoomScale(region);
+			const regionFocus = clampFocusToScale(region.focus, zoomScale);
 
 			targetScaleFactor = zoomScale;
 			targetFocus = regionFocus;
