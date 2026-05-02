@@ -69,6 +69,7 @@ import {
 	type PlaybackSpeed,
 	type SpeedRegion,
 	type TrimRegion,
+	ZOOM_DEPTH_SCALES,
 	type ZoomDepth,
 	type ZoomFocus,
 	type ZoomFocusMode,
@@ -686,6 +687,7 @@ export default function VideoEditor() {
 				startMs: Math.round(span.start),
 				endMs: Math.round(span.end),
 				depth: DEFAULT_ZOOM_DEPTH,
+				customScale: ZOOM_DEPTH_SCALES[DEFAULT_ZOOM_DEPTH],
 				focus: { cx: 0.5, cy: 0.5 },
 			};
 			pushState((prev) => ({ zoomRegions: [...prev.zoomRegions, newRegion] }));
@@ -705,6 +707,7 @@ export default function VideoEditor() {
 				startMs: Math.round(span.start),
 				endMs: Math.round(span.end),
 				depth: DEFAULT_ZOOM_DEPTH,
+				customScale: ZOOM_DEPTH_SCALES[DEFAULT_ZOOM_DEPTH],
 				focus: clampFocusToDepth(focus, DEFAULT_ZOOM_DEPTH),
 			};
 			pushState((prev) => ({ zoomRegions: [...prev.zoomRegions, newRegion] }));
@@ -788,7 +791,7 @@ export default function VideoEditor() {
 						? {
 								...region,
 								depth,
-								customScale: undefined,
+								customScale: ZOOM_DEPTH_SCALES[depth],
 								focus: clampFocusToDepth(region.focus, depth),
 							}
 						: region,
