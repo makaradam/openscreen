@@ -33,6 +33,8 @@ export interface ZoomRegion {
 	depth: ZoomDepth;
 	focus: ZoomFocus;
 	focusMode?: ZoomFocusMode;
+	/** Custom scale overriding the preset depth (1.0–5.0, two decimal precision). */
+	customScale?: number;
 }
 
 export interface CursorTelemetryPoint {
@@ -227,7 +229,15 @@ export const ZOOM_DEPTH_SCALES: Record<ZoomDepth, number> = {
 	6: 5.0,
 };
 
+export const MIN_ZOOM_SCALE = 1.0;
+export const MAX_ZOOM_SCALE = 5.0;
+
 export const DEFAULT_ZOOM_DEPTH: ZoomDepth = 3;
+
+/** Returns the effective zoom scale for a region, preferring customScale over the preset. */
+export function getZoomScale(region: ZoomRegion): number {
+	return region.customScale ?? ZOOM_DEPTH_SCALES[region.depth];
+}
 
 export function clampFocusToDepth(focus: ZoomFocus, _depth: ZoomDepth): ZoomFocus {
 	return {
