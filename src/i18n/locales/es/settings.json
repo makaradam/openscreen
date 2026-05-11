@@ -1,4 +1,4 @@
-{
+﻿{
 	"zoom": {
 		"level": "Nivel de zoom",
 		"selectRegion": "Selecciona una región de zoom para ajustar",
@@ -88,7 +88,8 @@
 	},
 	"project": {
 		"save": "Guardar proyecto",
-		"load": "Cargar proyecto"
+		"load": "Cargar proyecto",
+		"new": "Nuevo proyecto"
 	},
 	"export": {
 		"videoButton": "Exportar video",

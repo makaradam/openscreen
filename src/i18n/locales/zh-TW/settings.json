@@ -1,4 +1,4 @@
-{
+﻿{
 	"zoom": {
 		"level": "縮放級別",
 		"selectRegion": "選擇要調整的縮放區域",
@@ -95,7 +95,8 @@
 	},
 	"project": {
 		"save": "儲存專案",
-		"load": "載入專案"
+		"load": "載入專案",
+		"new": "新增專案"
 	},
 	"export": {
 		"videoButton": "匯出影片",

@@ -1,4 +1,4 @@
-{
+﻿{
 	"zoom": {
 		"level": "Yakınlaştırma Seviyesi",
 		"selectRegion": "Ayarlamak için bir yakınlaştırma bölgesi seçin",
@@ -88,7 +88,8 @@
 	},
 	"project": {
 		"save": "Projeyi Kaydet",
-		"load": "Proje Yükle"
+		"load": "Proje Yükle",
+		"new": "Yeni Proje"
 	},
 	"export": {
 		"videoButton": "Videoyu Dışa Aktar",

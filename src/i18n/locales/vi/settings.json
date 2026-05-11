@@ -1,4 +1,4 @@
-{
+﻿{
 	"zoom": {
 		"level": "Mức độ thu phóng",
 		"selectRegion": "Chọn vùng thu phóng để điều chỉnh",
@@ -78,7 +78,8 @@
 	},
 	"project": {
 		"save": "Lưu dự án",
-		"load": "Tải dự án"
+		"load": "Tải dự án",
+		"new": "Dự án mới"
 	},
 	"export": {
 		"videoButton": "Xuất Video",
