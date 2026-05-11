@@ -460,7 +460,11 @@ export default function VideoEditor() {
 		gifSizePreset,
 	]);
 
-	const hasUnsavedChanges = hasProjectUnsavedChanges(currentProjectSnapshot, lastSavedSnapshot);
+	// A video is loaded but no project file exists on disk yet (fresh recording
+	// or imported video) — treat as unsaved even before any edits are made.
+	const hasUnsavedChanges =
+		(videoPath !== null && currentProjectPath === null) ||
+		hasProjectUnsavedChanges(currentProjectSnapshot, lastSavedSnapshot);
 
 	useEffect(() => {
 		async function loadInitialData() {
