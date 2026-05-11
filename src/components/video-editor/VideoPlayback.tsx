@@ -444,6 +444,17 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			[onDurationChange, syncResolvedDuration],
 		);
 
+		// IMPORTANT: must use clampFocusToScale(focus, getZoomScale(region)) here,
+		// NOT clampFocusToStage(focus, region.depth).
+		//
+		// region.depth is the preset slot (1×/2×/4×) and ignores customScale entirely.
+		// getZoomScale(region) returns customScale when set, falling back to the preset
+		// depth scale — so drag-to-reposition respects the actual zoom level the user
+		// configured, not the preset bucket it sits in.
+		//
+		// This was previously broken (invisible drag boundaries near canvas edges) and
+		// has been fixed twice. If you're refactoring this drag handler, keep this call
+		// as clampFocusForRegion(focus, region) — do not switch it back to region.depth.
 		const clampFocusForRegion = useCallback((focus: ZoomFocus, region: ZoomRegion) => {
 			return clampFocusToScale(focus, getZoomScale(region));
 		}, []);
