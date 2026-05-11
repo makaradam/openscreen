@@ -389,7 +389,7 @@ export function LaunchWindow() {
 			{(showMicControls || showWebcamControls) && (
 				<div
 					data-hud-interactive="true"
-					className={`fixed bottom-[68px] left-1/2 -translate-x-1/2 flex items-center gap-2 animate-mic-panel-in ${styles.electronNoDrag}`}
+					className={`fixed bottom-[136px] left-1/2 -translate-x-1/2 flex items-center gap-2 animate-mic-panel-in ${styles.electronNoDrag}`}
 				>
 					{/* Mic selector */}
 					{showMicControls && (
