@@ -798,6 +798,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 				} catch (audioErr) {
 					console.warn("System audio capture failed, falling back to video-only:", audioErr);
 					toast.error(t("recording.systemAudioUnavailable"));
+					setSystemAudioEnabled(false);
 					screenMediaStream = await navigator.mediaDevices.getUserMedia({
 						audio: false,
 						video: videoConstraints,
