@@ -2197,8 +2197,7 @@ export default function VideoEditor() {
 							setWebcamVideoPath(null);
 							setWebcamVideoSourcePath(null);
 						}}
-						onProjectLoaded={handleLoadProject}
-						onProjectFileDropped={async (project, path) => {
+						onProjectOpened={async (project, path) => {
 							const restored = await applyLoadedProject(project, path);
 							if (!restored) {
 								toast.error(t("project.invalidFormat"));

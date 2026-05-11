@@ -1788,7 +1788,20 @@ export function registerIpcHandlers(
 			const content = await fs.readFile(filePath, "utf-8");
 			const project = JSON.parse(content);
 			currentProjectPath = filePath;
-			setCurrentRecordingSessionState(await getApprovedProjectSession(project, filePath));
+
+			// Approve session paths; tolerate failures (e.g. video moved outside
+			// trusted dirs) so the project still loads and the renderer can surface
+			// a "video not found" error rather than a generic load failure.
+			let session: import("../../src/lib/recordingSession").RecordingSession | null = null;
+			try {
+				session = await getApprovedProjectSession(project, filePath);
+			} catch (sessionError) {
+				console.warn(
+					"[loadProjectFileFromPath] Could not approve session paths, proceeding without session:",
+					sessionError,
+				);
+			}
+			setCurrentRecordingSessionState(session);
 			return { success: true, path: filePath, project };
 		} catch (error) {
 			console.error("Failed to load project file from path:", error);

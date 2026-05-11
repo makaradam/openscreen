@@ -5,17 +5,13 @@ import { nativeBridgeClient } from "@/native";
 
 interface EditorEmptyStateProps {
 	onVideoImported: (videoPath: string) => void;
-	onProjectLoaded: () => void;
-	onProjectFileDropped: (project: unknown, path: string | null) => void;
+	/** Called with the loaded project data — handles both button click and drag-drop */
+	onProjectOpened: (project: unknown, path: string | null) => void;
 }
 
 type DropError = "unsupported-format" | "load-failed" | null;
 
-export function EditorEmptyState({
-	onVideoImported,
-	onProjectLoaded,
-	onProjectFileDropped,
-}: EditorEmptyStateProps) {
+export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmptyStateProps) {
 	const [isDraggingOver, setIsDraggingOver] = useState(false);
 	const [dropError, setDropError] = useState<DropError>(null);
 
@@ -31,9 +27,9 @@ export function EditorEmptyState({
 
 	const handleLoadProject = useCallback(async () => {
 		const result = await nativeBridgeClient.project.loadProjectFile();
-		if (result.canceled || !result.success) return;
-		onProjectLoaded();
-	}, [onProjectLoaded]);
+		if (result.canceled || !result.success || !result.project) return;
+		onProjectOpened(result.project, result.path ?? null);
+	}, [onProjectOpened]);
 
 	const handleDragOver = useCallback((e: React.DragEvent) => {
 		e.preventDefault();
@@ -58,7 +54,6 @@ export function EditorEmptyState({
 
 			const projectFile = files.find((f) => f.name.endsWith(".openscreen"));
 			if (!projectFile) {
-				// Files were dropped but none are .openscreen
 				setDropError("unsupported-format");
 				return;
 			}
@@ -71,16 +66,14 @@ export function EditorEmptyState({
 			}
 
 			const result = await nativeBridgeClient.project.loadProjectFileFromPath(filePath);
-			if (!result.success) {
+			if (!result.success || !result.project) {
 				setDropError("load-failed");
 				return;
 			}
 
-			// Pass the already-loaded project data up so VideoEditor can apply it
-			// directly without re-opening a file picker dialog.
-			onProjectFileDropped(result.project, result.path ?? null);
+			onProjectOpened(result.project, result.path ?? null);
 		},
-		[onProjectFileDropped],
+		[onProjectOpened],
 	);
 
 	return (
