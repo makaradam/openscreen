@@ -1,4 +1,4 @@
-{
+﻿{
 	"export": {
 		"complete": "匯出完成",
 		"yourFormatReady": "您的 {{format}} 已準備就緒",
@@ -54,6 +54,9 @@
 		"detailNewProject": "是否在建立新專案前儲存目前的專案？",
 		"saveAndNewProject": "儲存並建立新專案",
 		"discardAndNewProject": "捨棄並建立新專案",
+		"detailLoadProject": "是否在載入其他專案前儲存目前的專案？",
+		"saveAndLoadProject": "儲存並載入專案",
+		"discardAndLoadProject": "捨棄並載入專案",
 		"loadProject": "載入專案…",
 		"saveProject": "儲存專案…",
 		"saveProjectAs": "專案另存新檔…"

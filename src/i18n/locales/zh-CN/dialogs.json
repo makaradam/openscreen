@@ -1,4 +1,4 @@
-{
+﻿{
 	"export": {
 		"complete": "导出完成",
 		"yourFormatReady": "您的 {{format}} 已准备就绪",
@@ -54,6 +54,9 @@
 		"detailNewProject": "是否在创建新项目前保存当前项目？",
 		"saveAndNewProject": "保存并新建项目",
 		"discardAndNewProject": "放弃并新建项目",
+		"detailLoadProject": "是否在加载其他项目前保存当前项目？",
+		"saveAndLoadProject": "保存并加载项目",
+		"discardAndLoadProject": "放弃并加载项目",
 		"loadProject": "加载项目…",
 		"saveProject": "保存项目…",
 		"saveProjectAs": "项目另存为…"

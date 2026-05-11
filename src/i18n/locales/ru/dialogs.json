@@ -1,4 +1,4 @@
-{
+﻿{
 	"export": {
 		"complete": "Экспорт завершён",
 		"yourFormatReady": "Ваш {{format}} готов",
@@ -54,6 +54,9 @@
 		"detailNewProject": "Хотите сохранить проект перед созданием нового?",
 		"saveAndNewProject": "Сохранить и новый проект",
 		"discardAndNewProject": "Отменить и новый проект",
+		"detailLoadProject": "Хотите сохранить проект перед загрузкой другого?",
+		"saveAndLoadProject": "Сохранить и загрузить проект",
+		"discardAndLoadProject": "Отменить и загрузить проект",
 		"loadProject": "Загрузить проект…",
 		"saveProject": "Сохранить проект…",
 		"saveProjectAs": "Сохранить проект как…"

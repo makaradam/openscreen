@@ -1,4 +1,4 @@
-{
+﻿{
 	"export": {
 		"complete": "Dışa Aktarım Tamamlandı",
 		"yourFormatReady": "{{format}} dosyanız hazır",
@@ -54,6 +54,9 @@
 		"detailNewProject": "Yeni proje oluşturmadan önce kaydetmek ister misiniz?",
 		"saveAndNewProject": "Kaydet ve Yeni Proje",
 		"discardAndNewProject": "Kaydetmeden Yeni Proje",
+		"detailLoadProject": "Başka bir proje yüklemeden önce kaydetmek ister misiniz?",
+		"saveAndLoadProject": "Kaydet ve Proje Yükle",
+		"discardAndLoadProject": "Kaydetmeden Proje Yükle",
 		"loadProject": "Proje Yükle…",
 		"saveProject": "Proje Kaydet…",
 		"saveProjectAs": "Farklı Kaydet…"
