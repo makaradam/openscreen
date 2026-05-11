@@ -39,8 +39,10 @@ export function createHudOverlayWindow(): BrowserWindow {
 	const primaryDisplay = screen.getPrimaryDisplay();
 	const { workArea } = primaryDisplay;
 
-	const windowWidth = 600;
-	const windowHeight = 160;
+	// Extra padding around the visible pill so CSS box-shadows (60px blur)
+	// aren't clipped by the transparent window boundary.
+	const windowWidth = 800;
+	const windowHeight = 260;
 
 	const x = Math.floor(workArea.x + (workArea.width - windowWidth) / 2);
 	const y = Math.floor(workArea.y + workArea.height - windowHeight - 5);
@@ -48,10 +50,10 @@ export function createHudOverlayWindow(): BrowserWindow {
 	const win = new BrowserWindow({
 		width: windowWidth,
 		height: windowHeight,
-		minWidth: 600,
-		maxWidth: 600,
-		minHeight: 160,
-		maxHeight: 160,
+		minWidth: 800,
+		maxWidth: 800,
+		minHeight: 260,
+		maxHeight: 260,
 		x: x,
 		y: y,
 		frame: false,
