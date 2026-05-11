@@ -510,9 +510,8 @@ export default function VideoEditor() {
 					setLastSavedSnapshot(
 						createProjectSnapshot({ screenVideoPath: result.path }, INITIAL_EDITOR_STATE),
 					);
-				} else {
-					setError("No video to load. Please record or select a video.");
 				}
+				// No video/project/session — leave videoPath null so the empty state renders
 			} catch (err) {
 				setError("Error loading video: " + String(err));
 			} finally {
