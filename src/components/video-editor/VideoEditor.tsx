@@ -1,5 +1,5 @@
 import type { Span } from "dnd-timeline";
-import { FolderOpen, Languages, Save, Video } from "lucide-react";
+import { FilePlus, FolderOpen, Languages, Save, Video } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { toast } from "sonner";
@@ -217,13 +217,13 @@ export default function VideoEditor() {
 		format: string;
 	} | null>(null);
 	const [isFullscreen, setIsFullscreen] = useState(false);
-	const [confirmDialogVariant, setConfirmDialogVariant] = useState<"close" | "newProject" | null>(
-		null,
-	);
+	const [confirmDialogVariant, setConfirmDialogVariant] = useState<
+		"close" | "newProject" | "loadProject" | null
+	>(null);
 	// Keeps the last non-null variant so the dialog content doesn't snap to the
 	// "close" fallback during the closing animation (which would briefly flash
 	// "Save & Close / Discard & Close" and fire a spurious sendCloseConfirmResponse).
-	const lastConfirmVariantRef = useRef<"close" | "newProject">("close");
+	const lastConfirmVariantRef = useRef<"close" | "newProject" | "loadProject">("close");
 	if (confirmDialogVariant !== null) {
 		lastConfirmVariantRef.current = confirmDialogVariant;
 	}
@@ -762,7 +762,7 @@ export default function VideoEditor() {
 		setWebcamVideoSourcePath(null);
 	}, [t]);
 
-	const handleLoadProject = useCallback(async () => {
+	const doLoadProject = useCallback(async () => {
 		const result = await nativeBridgeClient.project.loadProjectFile();
 
 		if (result.canceled) {
@@ -782,6 +782,27 @@ export default function VideoEditor() {
 
 		toast.success(t("project.loadedFrom", { path: result.path ?? "" }));
 	}, [applyLoadedProject, t]);
+
+	const handleLoadProject = useCallback(async () => {
+		if (hasUnsavedChanges) {
+			setConfirmDialogVariant("loadProject");
+			return;
+		}
+		await doLoadProject();
+	}, [hasUnsavedChanges, doLoadProject]);
+
+	const handleLoadProjectConfirmSave = useCallback(async () => {
+		setConfirmDialogVariant(null);
+		const saved = await saveProject(false);
+		if (saved) {
+			await doLoadProject();
+		}
+	}, [saveProject, doLoadProject]);
+
+	const handleLoadProjectConfirmDiscard = useCallback(async () => {
+		setConfirmDialogVariant(null);
+		await doLoadProject();
+	}, [doLoadProject]);
 
 	useEffect(() => {
 		const removeNewProjectListener = window.electronAPI.onMenuNewProject(handleNewProject);
@@ -2170,6 +2191,14 @@ export default function VideoEditor() {
 					</button>
 					<button
 						type="button"
+						onClick={handleNewProject}
+						className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/50 hover:text-white/90 hover:bg-white/[0.08] transition-all duration-150 text-[11px] font-medium"
+					>
+						<FilePlus size={14} />
+						{ts("project.new")}
+					</button>
+					<button
+						type="button"
 						onClick={handleLoadProject}
 						className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/50 hover:text-white/90 hover:bg-white/[0.08] transition-all duration-150 text-[11px] font-medium"
 					>
@@ -2535,15 +2564,20 @@ export default function VideoEditor() {
 				onSaveAndClose={
 					lastConfirmVariantRef.current === "newProject"
 						? handleNewProjectConfirmSave
-						: handleCloseConfirmSave
+						: lastConfirmVariantRef.current === "loadProject"
+							? handleLoadProjectConfirmSave
+							: handleCloseConfirmSave
 				}
 				onDiscardAndClose={
 					lastConfirmVariantRef.current === "newProject"
 						? handleNewProjectConfirmDiscard
-						: handleCloseConfirmDiscard
+						: lastConfirmVariantRef.current === "loadProject"
+							? handleLoadProjectConfirmDiscard
+							: handleCloseConfirmDiscard
 				}
 				onCancel={
-					lastConfirmVariantRef.current === "newProject"
+					lastConfirmVariantRef.current === "newProject" ||
+					lastConfirmVariantRef.current === "loadProject"
 						? () => setConfirmDialogVariant(null)
 						: handleCloseConfirmCancel
 				}

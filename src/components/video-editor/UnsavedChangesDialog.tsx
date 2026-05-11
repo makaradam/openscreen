@@ -10,7 +10,7 @@ import { useScopedT } from "@/contexts/I18nContext";
 
 interface UnsavedChangesDialogProps {
 	isOpen: boolean;
-	variant?: "close" | "newProject";
+	variant?: "close" | "newProject" | "loadProject";
 	onSaveAndClose: () => void;
 	onDiscardAndClose: () => void;
 	onCancel: () => void;
@@ -26,14 +26,24 @@ export function UnsavedChangesDialog({
 	const td = useScopedT("dialogs");
 	const tc = useScopedT("common");
 
-	const isNewProject = variant === "newProject";
-	const detail = isNewProject ? td("unsavedChanges.detailNewProject") : td("unsavedChanges.detail");
-	const saveLabel = isNewProject
-		? td("unsavedChanges.saveAndNewProject")
-		: td("unsavedChanges.saveAndClose");
-	const discardLabel = isNewProject
-		? td("unsavedChanges.discardAndNewProject")
-		: td("unsavedChanges.discardAndClose");
+	const detail =
+		variant === "newProject"
+			? td("unsavedChanges.detailNewProject")
+			: variant === "loadProject"
+				? td("unsavedChanges.detailLoadProject")
+				: td("unsavedChanges.detail");
+	const saveLabel =
+		variant === "newProject"
+			? td("unsavedChanges.saveAndNewProject")
+			: variant === "loadProject"
+				? td("unsavedChanges.saveAndLoadProject")
+				: td("unsavedChanges.saveAndClose");
+	const discardLabel =
+		variant === "newProject"
+			? td("unsavedChanges.discardAndNewProject")
+			: variant === "loadProject"
+				? td("unsavedChanges.discardAndLoadProject")
+				: td("unsavedChanges.discardAndClose");
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
