@@ -129,7 +129,7 @@ export function EditorEmptyState({
 					<p className="text-xs text-slate-600">
 						Supported formats: MP4, MOV, WebM, MKV, AVI, M4V, WMV
 					</p>
-					<div className="flex items-center gap-1.5 text-xs text-slate-700">
+					<div className="flex items-center gap-1.5 text-xs text-slate-700 mt-4">
 						<Upload className="h-3 w-3" />
 						<span>
 							or drag & drop a <span className="text-slate-500 font-medium">.openscreen</span>{" "}
