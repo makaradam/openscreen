@@ -1,4 +1,4 @@
-{
+﻿{
 	"errors": {
 		"noVideoLoaded": "Video yüklenmedi",
 		"videoNotReady": "Video hazır değil",
@@ -42,5 +42,20 @@
 		"description": "Mevcut oturumunuz kaydedildi.",
 		"cancel": "İptal",
 		"confirm": "Onayla"
+	},
+	"emptyState": {
+		"title": "Açık proje yok",
+		"description": "Düzenlemeye başlamak için bir video içe aktarın veya mevcut bir OpenScreen projesi yükleyin.",
+		"importVideoButton": "Video Dosyası İçe Aktar…",
+		"loadProjectButton": "Proje Yükle…",
+		"supportedFormats": "Desteklenen formatlar: MP4, MOV, WebM, MKV, AVI, M4V, WMV",
+		"dragDropHint": "veya bir .openscreen proje dosyasını buraya sürükleyip bırakın",
+		"dropOverlay": "Açmak için proje dosyasını bırakın",
+		"dropErrors": {
+			"unsupportedFormatTitle": "Desteklenmeyen Format",
+			"unsupportedFormatMessage": "Buraya yalnızca .openscreen proje dosyaları bırakılabilir. Video içe aktarmak için \"Video Dosyası İçe Aktar...\" düğmesini kullanın.",
+			"couldNotOpenTitle": "Dosya Açılamadı",
+			"couldNotOpenMessage": "Proje dosyası açılamadı. Başvurulan video taşınmış veya silinmiş olabilir."
+		}
 	}
 }
