@@ -717,6 +717,8 @@ export default function VideoEditor() {
 		await nativeBridgeClient.project.clearCurrentVideoPath();
 		setVideoPath(null);
 		setVideoSourcePath(null);
+		setWebcamVideoPath(null);
+		setWebcamVideoSourcePath(null);
 		setCurrentProjectPath(null);
 		setLastSavedSnapshot(null);
 	}, []);
@@ -754,6 +756,10 @@ export default function VideoEditor() {
 
 		setVideoPath(toFileUrl(result.path));
 		setVideoSourcePath(result.path);
+		// Imported videos never have a webcam track — clear any leftover state
+		// from a previous recording so it doesn't bleed into the new project.
+		setWebcamVideoPath(null);
+		setWebcamVideoSourcePath(null);
 	}, [t]);
 
 	const handleLoadProject = useCallback(async () => {
