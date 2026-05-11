@@ -124,7 +124,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	loadProjectFileFromPath: (filePath: string) => {
 		return ipcRenderer.invoke("load-project-file-from-path", filePath);
 	},
-	getPathForFile: (file: File) => webUtils.getPathForFile(file),
+	getPathForFile: (file: File) => {
+		try {
+			return webUtils.getPathForFile(file);
+		} catch {
+			return "";
+		}
+	},
 	loadCurrentProjectFile: () => {
 		return ipcRenderer.invoke("load-current-project-file");
 	},
