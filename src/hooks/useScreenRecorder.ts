@@ -596,15 +596,13 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 
 			const availability = await window.electronAPI.isNativeWindowsCaptureAvailable();
 			if (!availability.success || !availability.available) {
-				if (availability.reason === "unsupported-os") {
+				// Fall back to the web MediaRecorder path when the native helper
+				// binary isn't installed (dev mode) or the OS isn't supported.
+				if (availability.reason === "unsupported-os" || availability.reason === "missing-helper") {
 					return false;
 				}
 
-				throw new Error(
-					availability.reason === "missing-helper"
-						? "Native Windows capture helper is not available."
-						: (availability.error ?? "Native Windows capture is not available."),
-				);
+				throw new Error(availability.error ?? "Native Windows capture is not available.");
 			}
 
 			if (!isCountdownRunActive(countdownRunToken)) {
