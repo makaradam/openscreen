@@ -1,6 +1,7 @@
 import { AlertCircle, Film, FolderOpen, Upload, X } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useScopedT } from "@/contexts/I18nContext";
 import { nativeBridgeClient } from "@/native";
 
 interface EditorEmptyStateProps {
@@ -12,8 +13,16 @@ interface EditorEmptyStateProps {
 type DropError = "unsupported-format" | "load-failed" | null;
 
 export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmptyStateProps) {
+	const te = useScopedT("editor");
+	const tc = useScopedT("common");
 	const [isDraggingOver, setIsDraggingOver] = useState(false);
 	const [dropError, setDropError] = useState<DropError>(null);
+	// Freeze the last non-null error type so dialog content doesn't snap to the
+	// else-branch during the closing animation (same pattern as UnsavedChangesDialog).
+	const lastDropErrorRef = useRef<Exclude<DropError, null>>("unsupported-format");
+	if (dropError !== null) {
+		lastDropErrorRef.current = dropError;
+	}
 
 	const handleImportVideo = useCallback(async () => {
 		const result = await window.electronAPI.openVideoFilePicker();
@@ -58,14 +67,20 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 				return;
 			}
 
-			// Electron exposes the real filesystem path on the File object
-			const filePath = (projectFile as File & { path: string }).path;
+			// Use Electron's webUtils.getPathForFile — File.path was removed in Electron 32+
+			const filePath = window.electronAPI.getPathForFile(projectFile);
 			if (!filePath) {
 				setDropError("load-failed");
 				return;
 			}
 
-			const result = await nativeBridgeClient.project.loadProjectFileFromPath(filePath);
+			let result: Awaited<ReturnType<typeof window.electronAPI.loadProjectFileFromPath>>;
+			try {
+				result = await window.electronAPI.loadProjectFileFromPath(filePath);
+			} catch {
+				setDropError("load-failed");
+				return;
+			}
 			if (!result.success || !result.project) {
 				setDropError("load-failed");
 				return;
@@ -87,14 +102,14 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 			{isDraggingOver && (
 				<div className="pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#34B27B] bg-[#34B27B]/10">
 					<Upload className="mb-3 h-10 w-10 text-[#34B27B]" />
-					<p className="text-base font-semibold text-[#34B27B]">Drop project file to open</p>
+					<p className="text-base font-semibold text-[#34B27B]">{te("emptyState.dropOverlay")}</p>
 				</div>
 			)}
 
 			{/* Drop error dialog */}
 			<Dialog open={dropError !== null} onOpenChange={(open) => !open && setDropError(null)}>
 				<DialogContent className="bg-[#09090b] border-white/10 rounded-2xl max-w-sm p-6 gap-0">
-					<DialogHeader className="mb-5">
+					<DialogHeader className="mb-4">
 						<div className="flex items-center gap-3">
 							<img
 								src="./openscreen.png"
@@ -103,17 +118,21 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 								className="w-9 h-9 rounded-xl flex-shrink-0"
 							/>
 							<DialogTitle className="text-base font-semibold text-slate-200 leading-tight">
-								{dropError === "unsupported-format" ? "Unsupported Format" : "Could Not Open File"}
+								{lastDropErrorRef.current === "unsupported-format"
+									? te("emptyState.dropErrors.unsupportedFormatTitle")
+									: te("emptyState.dropErrors.couldNotOpenTitle")}
 							</DialogTitle>
 						</div>
 					</DialogHeader>
 
-					<div className="flex items-start gap-3 mb-6">
-						<AlertCircle className="w-4 h-4 text-slate-500 mt-0.5 flex-shrink-0" />
+					<div className="flex flex-col items-center gap-3 mb-6 text-center">
+						<div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10">
+							<AlertCircle className="w-5 h-5 text-slate-400 flex-shrink-0" />
+						</div>
 						<p className="text-sm text-slate-400 leading-relaxed">
-							{dropError === "unsupported-format"
-								? "Sorry, this file format is not supported. Only .openscreen project files can be dropped here."
-								: "The project file could not be opened. The video it references may have been moved or deleted."}
+							{lastDropErrorRef.current === "unsupported-format"
+								? te("emptyState.dropErrors.unsupportedFormatMessage")
+								: te("emptyState.dropErrors.couldNotOpenMessage")}
 						</p>
 					</div>
 
@@ -123,7 +142,7 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 						className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-medium text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090b]"
 					>
 						<X className="w-4 h-4" />
-						Close
+						{tc("actions.close")}
 					</button>
 				</DialogContent>
 			</Dialog>
@@ -138,9 +157,9 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 				/>
 
 				<div className="flex flex-col gap-2">
-					<h2 className="text-xl font-semibold text-slate-200">No project open</h2>
+					<h2 className="text-xl font-semibold text-slate-200">{te("emptyState.title")}</h2>
 					<p className="max-w-sm text-sm leading-relaxed text-slate-500">
-						Import a video to start editing, or load an existing OpenScreen project.
+						{te("emptyState.description")}
 					</p>
 				</div>
 
@@ -152,7 +171,7 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 						className="flex items-center justify-center gap-2.5 w-full px-4 py-3 rounded-xl bg-[#34B27B] hover:bg-[#2d9e6c] active:bg-[#27885c] text-white font-medium text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#34B27B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090b]"
 					>
 						<Film className="h-4 w-4" />
-						Import Video File…
+						{te("emptyState.importVideoButton")}
 					</button>
 					<button
 						type="button"
@@ -160,20 +179,15 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 						className="flex items-center justify-center gap-2.5 w-full px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-medium text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090b]"
 					>
 						<FolderOpen className="h-4 w-4" />
-						Load Project…
+						{te("emptyState.loadProjectButton")}
 					</button>
 				</div>
 
 				<div className="flex flex-col items-center gap-2">
-					<p className="text-xs text-slate-600">
-						Supported formats: MP4, MOV, WebM, MKV, AVI, M4V, WMV
-					</p>
+					<p className="text-xs text-slate-600">{te("emptyState.supportedFormats")}</p>
 					<div className="flex items-center gap-1.5 text-xs text-slate-700 mt-4">
 						<Upload className="h-3 w-3" />
-						<span>
-							or drag & drop a <span className="text-slate-500 font-medium">.openscreen</span>{" "}
-							project file here
-						</span>
+						<span>{te("emptyState.dragDropHint")}</span>
 					</div>
 				</div>
 			</div>
