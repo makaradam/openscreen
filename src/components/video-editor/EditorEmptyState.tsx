@@ -68,7 +68,13 @@ export function EditorEmptyState({ onVideoImported, onProjectOpened }: EditorEmp
 			}
 
 			// Use Electron's webUtils.getPathForFile — File.path was removed in Electron 32+
-			const filePath = window.electronAPI.getPathForFile(projectFile);
+			let filePath: string;
+			try {
+				filePath = window.electronAPI.getPathForFile(projectFile);
+			} catch {
+				setDropError("load-failed");
+				return;
+			}
 			if (!filePath) {
 				setDropError("load-failed");
 				return;
