@@ -132,8 +132,8 @@ export function createEditorWindow(): BrowserWindow {
 		alwaysOnTop: false,
 		skipTaskbar: false,
 		title: "OpenScreen",
-		backgroundColor: "#000000",
-		show: !HEADLESS,
+		backgroundColor: "#09090b",
+		show: false, // shown via ready-to-show to avoid white flash on first load
 		webPreferences: {
 			preload: path.join(__dirname, "preload.mjs"),
 			additionalArguments: [ASSET_BASE_URL_ARG],
@@ -146,6 +146,11 @@ export function createEditorWindow(): BrowserWindow {
 
 	// Maximize the window by default
 	win.maximize();
+
+	// Show only once content is painted — prevents white flash on cold Vite start
+	win.once("ready-to-show", () => {
+		if (!HEADLESS) win.show();
+	});
 
 	win.webContents.on("did-finish-load", () => {
 		win?.webContents.send("main-process-message", new Date().toLocaleString());
