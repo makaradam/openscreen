@@ -2205,7 +2205,7 @@ export default function VideoEditor() {
 						onClick={() => {
 							// Skip the confirmation dialog if there's nothing loaded yet
 							if (!videoPath) {
-								void window.electronAPI.startNewRecording();
+								void handleNewRecordingConfirm();
 							} else {
 								setShowNewRecordingDialog(true);
 							}
