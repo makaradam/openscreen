@@ -995,10 +995,10 @@ export function registerIpcHandlers(
 	});
 
 	ipcMain.handle("switch-to-editor", () => {
-		const mainWin = getMainWindow();
-		if (mainWin) {
-			mainWin.close();
-		}
+		// createEditorWindow is createEditorWindowWrapper — it already closes
+		// the current mainWindow (the HUD) before opening the editor. Closing
+		// it here too causes a double-close which leaves ghost transparent
+		// windows and makes the HUD shadow compound on each cycle.
 		createEditorWindow();
 	});
 
