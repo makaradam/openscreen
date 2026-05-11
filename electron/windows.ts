@@ -41,19 +41,23 @@ export function createHudOverlayWindow(): BrowserWindow {
 
 	// Extra padding around the visible pill so CSS box-shadows (60px blur)
 	// aren't clipped by the transparent window boundary.
+	// The pill sits at CSS `bottom-20` (80px from window bottom) so the
+	// downward shadow has ~80px of transparent space to expand into.
+	// The window is positioned so the pill's screen position stays unchanged.
 	const windowWidth = 800;
-	const windowHeight = 260;
-
+	const windowHeight = 320;
+	// Pill is bottom-20 (80px) instead of bottom-5 (20px), so shift window
+	// down 60px to keep the pill at the same visual screen position.
 	const x = Math.floor(workArea.x + (workArea.width - windowWidth) / 2);
-	const y = Math.floor(workArea.y + workArea.height - windowHeight - 5);
+	const y = Math.floor(workArea.y + workArea.height - windowHeight + 55);
 
 	const win = new BrowserWindow({
 		width: windowWidth,
 		height: windowHeight,
 		minWidth: 800,
 		maxWidth: 800,
-		minHeight: 260,
-		maxHeight: 260,
+		minHeight: 320,
+		maxHeight: 320,
 		x: x,
 		y: y,
 		frame: false,
@@ -62,7 +66,7 @@ export function createHudOverlayWindow(): BrowserWindow {
 		alwaysOnTop: true,
 		skipTaskbar: true,
 		hasShadow: false,
-		show: !HEADLESS,
+		show: false, // shown via ready-to-show to avoid black flash
 		webPreferences: {
 			preload: path.join(__dirname, "preload.mjs"),
 			additionalArguments: [ASSET_BASE_URL_ARG],
@@ -78,6 +82,11 @@ export function createHudOverlayWindow(): BrowserWindow {
 	if (process.platform === "darwin") {
 		win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
 	}
+
+	// Show only once content is painted — prevents black rectangle flash
+	win.once("ready-to-show", () => {
+		if (!HEADLESS) win.show();
+	});
 
 	win.webContents.on("did-finish-load", () => {
 		win?.webContents.send("main-process-message", new Date().toLocaleString());
