@@ -155,6 +155,7 @@ export default function VideoEditor() {
 		commitState,
 		undo,
 		redo,
+		resetState,
 	} = useEditorHistory(INITIAL_EDITOR_STATE);
 
 	const {
@@ -715,13 +716,38 @@ export default function VideoEditor() {
 
 	const doNewProject = useCallback(async () => {
 		await nativeBridgeClient.project.clearCurrentVideoPath();
+		// Clear media / project pointers
 		setVideoPath(null);
 		setVideoSourcePath(null);
 		setWebcamVideoPath(null);
 		setWebcamVideoSourcePath(null);
 		setCurrentProjectPath(null);
 		setLastSavedSnapshot(null);
-	}, []);
+		// Reset all undoable editor state (zoom, trim, annotations, crop, wallpaper, etc.)
+		// and clear the undo/redo history so the new project starts with a clean slate.
+		resetState();
+		// Reset non-undoable selection state
+		setSelectedZoomId(null);
+		setSelectedTrimId(null);
+		setSelectedSpeedId(null);
+		setSelectedAnnotationId(null);
+		setSelectedBlurId(null);
+		// Reset playback
+		setCurrentTime(0);
+		setIsPlaying(false);
+		// Reset cursor preferences to defaults
+		setShowCursor(true);
+		setCursorSize(DEFAULT_CURSOR_SIZE);
+		setCursorSmoothing(DEFAULT_CURSOR_SMOOTHING);
+		setCursorMotionBlur(DEFAULT_CURSOR_MOTION_BLUR);
+		setCursorClickBounce(DEFAULT_CURSOR_CLICK_BOUNCE);
+		// Reset region ID counters
+		nextZoomIdRef.current = 1;
+		nextTrimIdRef.current = 1;
+		nextSpeedIdRef.current = 1;
+		nextAnnotationIdRef.current = 1;
+		nextAnnotationZIndexRef.current = 1;
+	}, [resetState]);
 
 	const handleNewProject = useCallback(async () => {
 		if (hasUnsavedChanges) {
