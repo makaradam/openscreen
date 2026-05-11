@@ -51,6 +51,9 @@
 		"detail": "هل تريد حفظ مشروعك قبل الإغلاق؟",
 		"saveAndClose": "حفظ وإغلاق",
 		"discardAndClose": "تجاهل وإغلاق",
+		"detailNewProject": "هل تريد حفظ مشروعك قبل إنشاء مشروع جديد؟",
+		"saveAndNewProject": "حفظ وإنشاء مشروع جديد",
+		"discardAndNewProject": "تجاهل وإنشاء مشروع جديد",
 		"loadProject": "تحميل مشروع...",
 		"saveProject": "حفظ المشروع...",
 		"saveProjectAs": "حفظ المشروع باسم..."

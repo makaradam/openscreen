@@ -217,7 +217,9 @@ export default function VideoEditor() {
 		format: string;
 	} | null>(null);
 	const [isFullscreen, setIsFullscreen] = useState(false);
-	const [showCloseConfirmDialog, setShowCloseConfirmDialog] = useState(false);
+	const [confirmDialogVariant, setConfirmDialogVariant] = useState<"close" | "newProject" | null>(
+		null,
+	);
 	const playerContainerRef = useRef<HTMLDivElement | null>(null);
 	const cursorTelemetrySourcePath = videoSourcePath ?? (videoPath ? fromFileUrl(videoPath) : null);
 	const { samples: cursorTelemetry, error: cursorTelemetryError } =
@@ -664,23 +666,23 @@ export default function VideoEditor() {
 
 	useEffect(() => {
 		const cleanup = window.electronAPI.onRequestCloseConfirm(() => {
-			setShowCloseConfirmDialog(true);
+			setConfirmDialogVariant("close");
 		});
 		return () => cleanup();
 	}, []);
 
 	const handleCloseConfirmSave = useCallback(() => {
-		setShowCloseConfirmDialog(false);
+		setConfirmDialogVariant(null);
 		window.electronAPI.sendCloseConfirmResponse("save");
 	}, []);
 
 	const handleCloseConfirmDiscard = useCallback(() => {
-		setShowCloseConfirmDialog(false);
+		setConfirmDialogVariant(null);
 		window.electronAPI.sendCloseConfirmResponse("discard");
 	}, []);
 
 	const handleCloseConfirmCancel = useCallback(() => {
-		setShowCloseConfirmDialog(false);
+		setConfirmDialogVariant(null);
 		window.electronAPI.sendCloseConfirmResponse("cancel");
 	}, []);
 
@@ -704,11 +706,34 @@ export default function VideoEditor() {
 		}
 	}, []);
 
-	const handleNewProject = useCallback(async () => {
+	const doNewProject = useCallback(async () => {
 		await nativeBridgeClient.project.clearCurrentVideoPath();
 		setVideoPath(null);
 		setVideoSourcePath(null);
+		setCurrentProjectPath(null);
+		setLastSavedSnapshot(null);
 	}, []);
+
+	const handleNewProject = useCallback(async () => {
+		if (hasUnsavedChanges) {
+			setConfirmDialogVariant("newProject");
+			return;
+		}
+		await doNewProject();
+	}, [hasUnsavedChanges, doNewProject]);
+
+	const handleNewProjectConfirmSave = useCallback(async () => {
+		setConfirmDialogVariant(null);
+		const saved = await saveProject(false);
+		if (saved) {
+			await doNewProject();
+		}
+	}, [saveProject, doNewProject]);
+
+	const handleNewProjectConfirmDiscard = useCallback(async () => {
+		setConfirmDialogVariant(null);
+		await doNewProject();
+	}, [doNewProject]);
 
 	const handleImportVideo = useCallback(async () => {
 		const result = await window.electronAPI.openVideoFilePicker();
@@ -2485,10 +2510,23 @@ export default function VideoEditor() {
 			/>
 
 			<UnsavedChangesDialog
-				isOpen={showCloseConfirmDialog}
-				onSaveAndClose={handleCloseConfirmSave}
-				onDiscardAndClose={handleCloseConfirmDiscard}
-				onCancel={handleCloseConfirmCancel}
+				isOpen={confirmDialogVariant !== null}
+				variant={confirmDialogVariant ?? "close"}
+				onSaveAndClose={
+					confirmDialogVariant === "newProject"
+						? handleNewProjectConfirmSave
+						: handleCloseConfirmSave
+				}
+				onDiscardAndClose={
+					confirmDialogVariant === "newProject"
+						? handleNewProjectConfirmDiscard
+						: handleCloseConfirmDiscard
+				}
+				onCancel={
+					confirmDialogVariant === "newProject"
+						? () => setConfirmDialogVariant(null)
+						: handleCloseConfirmCancel
+				}
 			/>
 		</div>
 	);

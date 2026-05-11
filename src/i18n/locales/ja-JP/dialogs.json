@@ -52,6 +52,9 @@
 		"detail": "閉じる前にプロジェクトを保存しますか？",
 		"saveAndClose": "保存して閉じる",
 		"discardAndClose": "破棄して閉じる",
+		"detailNewProject": "新しいプロジェクトを作成する前に保存しますか？",
+		"saveAndNewProject": "保存して新規プロジェクト",
+		"discardAndNewProject": "破棄して新規プロジェクト",
 		"loadProject": "プロジェクトを読み込む…",
 		"saveProject": "プロジェクトを保存…",
 		"saveProjectAs": "プロジェクトを名前を付けて保存…"
