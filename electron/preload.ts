@@ -124,6 +124,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	loadCurrentProjectFile: () => {
 		return ipcRenderer.invoke("load-current-project-file");
 	},
+	onMenuNewProject: (callback: () => void) => {
+		const listener = () => callback();
+		ipcRenderer.on("menu-new-project", listener);
+		return () => ipcRenderer.removeListener("menu-new-project", listener);
+	},
+	onMenuImportVideo: (callback: () => void) => {
+		const listener = () => callback();
+		ipcRenderer.on("menu-import-video", listener);
+		return () => ipcRenderer.removeListener("menu-import-video", listener);
+	},
 	onMenuLoadProject: (callback: () => void) => {
 		const listener = () => callback();
 		ipcRenderer.on("menu-load-project", listener);

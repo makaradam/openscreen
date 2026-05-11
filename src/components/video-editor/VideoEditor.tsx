@@ -46,6 +46,7 @@ import {
 	getNativeAspectRatioValue,
 	isPortraitAspectRatio,
 } from "@/utils/aspectRatioUtils";
+import { EditorEmptyState } from "./EditorEmptyState";
 import { ExportDialog } from "./ExportDialog";
 import PlaybackControls from "./PlaybackControls";
 import {
@@ -693,6 +694,26 @@ export default function VideoEditor() {
 		}
 	}, []);
 
+	const handleNewProject = useCallback(async () => {
+		await nativeBridgeClient.project.clearCurrentVideoPath();
+		setVideoPath(null);
+		setVideoSourcePath(null);
+	}, []);
+
+	const handleImportVideo = useCallback(async () => {
+		const result = await window.electronAPI.openVideoFilePicker();
+		if (result.canceled || !result.success || !result.path) return;
+
+		const setResult = await nativeBridgeClient.project.setCurrentVideoPath(result.path);
+		if (!setResult.success) {
+			toast.error(t("errors.noVideoLoaded"));
+			return;
+		}
+
+		setVideoPath(toFileUrl(result.path));
+		setVideoSourcePath(result.path);
+	}, [t]);
+
 	const handleLoadProject = useCallback(async () => {
 		const result = await nativeBridgeClient.project.loadProjectFile();
 
@@ -715,16 +736,26 @@ export default function VideoEditor() {
 	}, [applyLoadedProject, t]);
 
 	useEffect(() => {
+		const removeNewProjectListener = window.electronAPI.onMenuNewProject(handleNewProject);
+		const removeImportVideoListener = window.electronAPI.onMenuImportVideo(handleImportVideo);
 		const removeLoadListener = window.electronAPI.onMenuLoadProject(handleLoadProject);
 		const removeSaveListener = window.electronAPI.onMenuSaveProject(handleSaveProject);
 		const removeSaveAsListener = window.electronAPI.onMenuSaveProjectAs(handleSaveProjectAs);
 
 		return () => {
+			removeNewProjectListener?.();
+			removeImportVideoListener?.();
 			removeLoadListener?.();
 			removeSaveListener?.();
 			removeSaveAsListener?.();
 		};
-	}, [handleLoadProject, handleSaveProject, handleSaveProjectAs]);
+	}, [
+		handleNewProject,
+		handleImportVideo,
+		handleLoadProject,
+		handleSaveProject,
+		handleSaveProjectAs,
+	]);
 
 	useEffect(() => {
 		let canceled = false;
@@ -2079,7 +2110,20 @@ export default function VideoEditor() {
 				</div>
 			</div>
 
-			<div className="editor-workspace flex-1 min-h-0 relative">
+			{/* Empty state — shown when no video is loaded */}
+			{!videoPath && (
+				<div className="flex-1 min-h-0 relative">
+					<EditorEmptyState
+						onVideoImported={(path) => {
+							setVideoPath(toFileUrl(path));
+							setVideoSourcePath(path);
+						}}
+						onProjectLoaded={handleLoadProject}
+					/>
+				</div>
+			)}
+
+			<div className={`editor-workspace flex-1 min-h-0 relative ${!videoPath ? "hidden" : ""}`}>
 				<PanelGroup direction="vertical" className="gap-3 min-h-0">
 					{/* Top section: preview and contextual settings */}
 					<Panel defaultSize={67} maxSize={76} minSize={46} className="min-h-[300px]">

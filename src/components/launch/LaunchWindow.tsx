@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Languages } from "lucide-react";
+import { Check, ChevronDown, Clapperboard, Languages } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { BsPauseCircle, BsPlayCircle, BsRecordCircle } from "react-icons/bs";
@@ -708,6 +708,17 @@ export function LaunchWindow() {
 								onClick={openProjectFile}
 							>
 								{getIcon("folder", "text-white/60")}
+							</button>
+						</Tooltip>
+
+						{/* Open studio (empty) */}
+						<Tooltip content={t("tooltips.openStudio")}>
+							<button
+								data-testid="launch-open-studio-button"
+								className={`${hudIconBtnClasses} ${styles.electronNoDrag}`}
+								onClick={() => window.electronAPI.switchToEditor()}
+							>
+								<Clapperboard size={ICON_SIZE} className="text-white/60" />
 							</button>
 						</Tooltip>
 					</>

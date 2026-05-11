@@ -42,7 +42,17 @@ const PROJECT_FILE_EXTENSION = "openscreen";
 const SHORTCUTS_FILE = path.join(app.getPath("userData"), "shortcuts.json");
 const RECORDING_FILE_PREFIX = "recording-";
 const RECORDING_SESSION_SUFFIX = ".session.json";
-const ALLOWED_IMPORT_VIDEO_EXTENSIONS = new Set([".webm", ".mp4", ".mov", ".avi", ".mkv"]);
+const ALLOWED_IMPORT_VIDEO_EXTENSIONS = new Set([
+	".webm",
+	".mp4",
+	".mov",
+	".avi",
+	".mkv",
+	".m4v",
+	".wmv",
+	".flv",
+	".ts",
+]);
 
 /**
  * Paths explicitly approved by the user via file picker dialogs or project loads.
@@ -1533,7 +1543,7 @@ export function registerIpcHandlers(
 					filters: [
 						{
 							name: mainT("dialogs", "fileDialogs.videoFiles"),
-							extensions: ["webm", "mp4", "mov", "avi", "mkv"],
+							extensions: ["webm", "mp4", "mov", "avi", "mkv", "m4v", "wmv", "flv", "ts"],
 						},
 						{ name: mainT("dialogs", "fileDialogs.allFiles"), extensions: ["*"] },
 					],
@@ -1748,6 +1758,38 @@ export function registerIpcHandlers(
 		}
 	}
 
+	ipcMain.handle("load-project-file-from-path", async (_event, filePath: string) => {
+		return loadProjectFileFromPath(filePath);
+	});
+
+	async function loadProjectFileFromPath(filePath: string): Promise<ProjectFileResult> {
+		try {
+			if (!filePath || typeof filePath !== "string") {
+				return { success: false, message: "Invalid file path" };
+			}
+			// Validate extension and readability
+			if (!filePath.endsWith(`.${PROJECT_FILE_EXTENSION}`)) {
+				return { success: false, message: "Not an Openscreen project file" };
+			}
+			const stats = await fs.stat(filePath).catch(() => null);
+			if (!stats?.isFile()) {
+				return { success: false, message: "File not found" };
+			}
+			const content = await fs.readFile(filePath, "utf-8");
+			const project = JSON.parse(content);
+			currentProjectPath = filePath;
+			setCurrentRecordingSessionState(await getApprovedProjectSession(project, filePath));
+			return { success: true, path: filePath, project };
+		} catch (error) {
+			console.error("Failed to load project file from path:", error);
+			return {
+				success: false,
+				message: "Failed to load project file",
+				error: String(error),
+			};
+		}
+	}
+
 	ipcMain.handle("load-current-project-file", async () => {
 		return loadCurrentProjectFile();
 	});
@@ -1904,6 +1946,7 @@ export function registerIpcHandlers(
 		saveProjectFile,
 		loadProjectFile,
 		loadCurrentProjectFile,
+		loadProjectFileFromPath,
 		setCurrentVideoPath,
 		getCurrentVideoPathResult,
 		clearCurrentVideoPath,
