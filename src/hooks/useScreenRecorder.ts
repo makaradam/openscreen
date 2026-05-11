@@ -767,58 +767,47 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 			}
 
 			let screenMediaStream: MediaStream;
-			const platform = await window.electronAPI.getPlatform();
 
-			if (platform === "win32") {
-				// getDisplayMedia + setDisplayMediaRequestHandler (main.ts) supplies the
-				// pre-selected source. Editable cursor mode excludes the system cursor so
-				// the editor can render a replacement; system mode bakes it into the video.
-				screenMediaStream = await navigator.mediaDevices.getDisplayMedia({
-					video: {
-						cursor: cursorCaptureMode === "editable-overlay" ? "never" : "always",
-						width: { max: TARGET_WIDTH },
-						height: { max: TARGET_HEIGHT },
-						frameRate: { ideal: TARGET_FRAME_RATE },
-					} as MediaTrackConstraints,
-					audio: systemAudioEnabled,
-				} as DisplayMediaStreamOptions);
-			} else {
-				const videoConstraints = {
-					mandatory: {
-						chromeMediaSource: CHROME_MEDIA_SOURCE,
-						chromeMediaSourceId: selectedSource.id,
-						maxWidth: TARGET_WIDTH,
-						maxHeight: TARGET_HEIGHT,
-						maxFrameRate: TARGET_FRAME_RATE,
-						minFrameRate: MIN_FRAME_RATE,
-					},
-				};
+			// Use getUserMedia with chromeMediaSource on all platforms — this
+			// supplies the pre-selected source directly and works reliably on
+			// both macOS and Windows. The previous Windows-specific getDisplayMedia
+			// path required setDisplayMediaRequestHandler to be wired up in the
+			// main process (it never was), causing "Not supported" errors.
+			const videoConstraints = {
+				mandatory: {
+					chromeMediaSource: CHROME_MEDIA_SOURCE,
+					chromeMediaSourceId: selectedSource.id,
+					maxWidth: TARGET_WIDTH,
+					maxHeight: TARGET_HEIGHT,
+					maxFrameRate: TARGET_FRAME_RATE,
+					minFrameRate: MIN_FRAME_RATE,
+				},
+			};
 
-				if (systemAudioEnabled) {
-					try {
-						screenMediaStream = await navigator.mediaDevices.getUserMedia({
-							audio: {
-								mandatory: {
-									chromeMediaSource: CHROME_MEDIA_SOURCE,
-									chromeMediaSourceId: selectedSource.id,
-								},
+			if (systemAudioEnabled) {
+				try {
+					screenMediaStream = await navigator.mediaDevices.getUserMedia({
+						audio: {
+							mandatory: {
+								chromeMediaSource: CHROME_MEDIA_SOURCE,
+								chromeMediaSourceId: selectedSource.id,
 							},
-							video: videoConstraints,
-						} as unknown as MediaStreamConstraints);
-					} catch (audioErr) {
-						console.warn("System audio capture failed, falling back to video-only:", audioErr);
-						toast.error(t("recording.systemAudioUnavailable"));
-						screenMediaStream = await navigator.mediaDevices.getUserMedia({
-							audio: false,
-							video: videoConstraints,
-						} as unknown as MediaStreamConstraints);
-					}
-				} else {
+						},
+						video: videoConstraints,
+					} as unknown as MediaStreamConstraints);
+				} catch (audioErr) {
+					console.warn("System audio capture failed, falling back to video-only:", audioErr);
+					toast.error(t("recording.systemAudioUnavailable"));
 					screenMediaStream = await navigator.mediaDevices.getUserMedia({
 						audio: false,
 						video: videoConstraints,
 					} as unknown as MediaStreamConstraints);
 				}
+			} else {
+				screenMediaStream = await navigator.mediaDevices.getUserMedia({
+					audio: false,
+					video: videoConstraints,
+				} as unknown as MediaStreamConstraints);
 			}
 			screenStream.current = screenMediaStream;
 
