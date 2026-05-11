@@ -1015,14 +1015,17 @@ export function registerIpcHandlers(
 			return;
 		}
 
-		if (!overlayWindow.isVisible()) {
-			overlayWindow.showInactive();
-		}
-
+		// Wait for the first frame to be painted before showing the window.
+		// Showing before ready-to-show produces a black rectangle flash because
+		// Chromium hasn't rendered any pixels yet.
 		if (overlayWindow.webContents.isLoading()) {
 			await new Promise<void>((resolve) => {
-				overlayWindow.webContents.once("did-finish-load", () => resolve());
+				overlayWindow.once("ready-to-show", resolve);
 			});
+		}
+
+		if (!overlayWindow.isVisible()) {
+			overlayWindow.showInactive();
 		}
 
 		overlayWindow.webContents.send("countdown-overlay-value", value, runId);
