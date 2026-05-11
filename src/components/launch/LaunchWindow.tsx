@@ -318,12 +318,6 @@ export function LaunchWindow() {
 		}
 	};
 
-	const openProjectFile = async () => {
-		const result = await nativeBridgeClient.project.loadProjectFile();
-		if (result.canceled || !result.success) return;
-		await window.electronAPI.switchToEditor();
-	};
-
 	const sendHudOverlayHide = () => {
 		if (window.electronAPI && window.electronAPI.hudOverlayHide) {
 			window.electronAPI.hudOverlayHide();
@@ -671,29 +665,15 @@ export function LaunchWindow() {
 				)}
 
 				{!recording && (
-					<>
-						{/* Open project */}
-						<Tooltip content={t("tooltips.openProject")}>
-							<button
-								data-testid="launch-open-project-button"
-								className={`${hudIconBtnClasses} ${styles.electronNoDrag}`}
-								onClick={openProjectFile}
-							>
-								{getIcon("folder", "text-white/60")}
-							</button>
-						</Tooltip>
-
-						{/* Open studio (empty editor) */}
-						<Tooltip content={t("tooltips.openStudio")}>
-							<button
-								data-testid="launch-open-studio-button"
-								className={`${hudIconBtnClasses} ${styles.electronNoDrag}`}
-								onClick={() => window.electronAPI.switchToEditor()}
-							>
-								<Clapperboard size={ICON_SIZE} className="text-white/60" />
-							</button>
-						</Tooltip>
-					</>
+					<Tooltip content={t("tooltips.openStudio")}>
+						<button
+							data-testid="launch-open-studio-button"
+							className={`${hudIconBtnClasses} ${styles.electronNoDrag}`}
+							onClick={() => window.electronAPI.switchToEditor()}
+						>
+							<Clapperboard size={ICON_SIZE} className="text-white/60" />
+						</button>
+					</Tooltip>
 				)}
 
 				{/* Right sidebar controls */}
