@@ -684,6 +684,8 @@ export default function VideoEditor() {
 	}, [saveProject]);
 
 	const handleNewRecordingConfirm = useCallback(async () => {
+		// Drop the current session so the editor opens fresh next time
+		await nativeBridgeClient.project.clearCurrentVideoPath();
 		const result = await window.electronAPI.startNewRecording();
 		if (result.success) {
 			setShowNewRecordingDialog(false);
