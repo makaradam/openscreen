@@ -1002,6 +1002,13 @@ export function registerIpcHandlers(
 		createEditorWindow();
 	});
 
+	ipcMain.handle("start-new-recording", () => {
+		if (_switchToHud) {
+			_switchToHud();
+		}
+		return { success: true };
+	});
+
 	ipcMain.handle("countdown-overlay-show", async (_, value: number, runId: number) => {
 		const overlayWindow = getCountdownOverlayWindow?.() ?? createCountdownOverlayWindow();
 		if (overlayWindow.isDestroyed()) {

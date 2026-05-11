@@ -2084,7 +2084,14 @@ export default function VideoEditor() {
 					</div>
 					<button
 						type="button"
-						onClick={() => setShowNewRecordingDialog(true)}
+						onClick={() => {
+							// Skip the confirmation dialog if there's nothing loaded yet
+							if (!videoPath) {
+								void window.electronAPI.startNewRecording();
+							} else {
+								setShowNewRecordingDialog(true);
+							}
+						}}
 						className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/50 hover:text-white/90 hover:bg-white/[0.08] transition-all duration-150 text-[11px] font-medium"
 					>
 						<Video size={14} />
