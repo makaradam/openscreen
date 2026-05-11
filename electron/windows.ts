@@ -152,6 +152,14 @@ export function createEditorWindow(): BrowserWindow {
 		if (!HEADLESS) win.show();
 	});
 
+	// Inject dark background before any React paint so the sub-titlebar area
+	// never flashes white even on the very first cold Vite load
+	win.webContents.on("dom-ready", () => {
+		win.webContents
+			.insertCSS("html, body, #root { background: #09090b !important; }")
+			.catch(() => {});
+	});
+
 	win.webContents.on("did-finish-load", () => {
 		win?.webContents.send("main-process-message", new Date().toLocaleString());
 	});

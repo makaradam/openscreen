@@ -109,12 +109,7 @@ function isEditorWindow(window: BrowserWindow) {
 }
 
 function sendEditorMenuAction(
-	channel:
-		| "menu-load-project"
-		| "menu-save-project"
-		| "menu-save-project-as"
-		| "menu-new-project"
-		| "menu-import-video",
+	channel: "menu-load-project" | "menu-save-project" | "menu-save-project-as" | "menu-new-project",
 ) {
 	let targetWindow = BrowserWindow.getFocusedWindow() ?? mainWindow;
 
@@ -177,12 +172,6 @@ function setupApplicationMenu() {
 					label: mainT("dialogs", "unsavedChanges.newProject") || "New Project",
 					accelerator: "CmdOrCtrl+N",
 					click: () => sendEditorMenuAction("menu-new-project"),
-				},
-				{ type: "separator" as const },
-				{
-					label: mainT("dialogs", "unsavedChanges.importVideo") || "Import Video File…",
-					accelerator: "CmdOrCtrl+I",
-					click: () => sendEditorMenuAction("menu-import-video"),
 				},
 				{ type: "separator" as const },
 				{
