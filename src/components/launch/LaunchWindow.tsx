@@ -318,23 +318,6 @@ export function LaunchWindow() {
 		}
 	};
 
-	const openVideoFile = async () => {
-		const result = await window.electronAPI.openVideoFilePicker();
-
-		if (result.canceled) {
-			return;
-		}
-
-		if (result.success && result.path) {
-			const setVideoPathResult = await nativeBridgeClient.project.setCurrentVideoPath(result.path);
-			if (!setVideoPathResult.success) {
-				console.error("Failed to set current video path:", setVideoPathResult);
-				return;
-			}
-			await window.electronAPI.switchToEditor();
-		}
-	};
-
 	const openProjectFile = async () => {
 		const result = await nativeBridgeClient.project.loadProjectFile();
 		if (result.canceled || !result.success) return;
@@ -689,17 +672,6 @@ export function LaunchWindow() {
 
 				{!recording && (
 					<>
-						{/* Open video file */}
-						<Tooltip content={t("tooltips.openVideoFile")}>
-							<button
-								data-testid="launch-open-video-button"
-								className={`${hudIconBtnClasses} ${styles.electronNoDrag}`}
-								onClick={openVideoFile}
-							>
-								{getIcon("videoFile", "text-white/60")}
-							</button>
-						</Tooltip>
-
 						{/* Open project */}
 						<Tooltip content={t("tooltips.openProject")}>
 							<button
@@ -711,7 +683,7 @@ export function LaunchWindow() {
 							</button>
 						</Tooltip>
 
-						{/* Open studio (empty) */}
+						{/* Open studio (empty editor) */}
 						<Tooltip content={t("tooltips.openStudio")}>
 							<button
 								data-testid="launch-open-studio-button"
