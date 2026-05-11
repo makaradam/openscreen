@@ -64,7 +64,7 @@ export default function App() {
 			case "editor":
 				return (
 					<ShortcutsProvider>
-						<Suspense fallback={<div className="h-screen bg-background" />}>
+						<Suspense fallback={<div className="h-screen bg-[#09090b]" />}>
 							<VideoEditor />
 							<ShortcutsConfigDialog />
 						</Suspense>
