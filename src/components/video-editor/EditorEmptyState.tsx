@@ -5,9 +5,14 @@ import { nativeBridgeClient } from "@/native";
 interface EditorEmptyStateProps {
 	onVideoImported: (videoPath: string) => void;
 	onProjectLoaded: () => void;
+	onProjectFileDropped: (project: unknown, path: string | null) => void;
 }
 
-export function EditorEmptyState({ onVideoImported, onProjectLoaded }: EditorEmptyStateProps) {
+export function EditorEmptyState({
+	onVideoImported,
+	onProjectLoaded,
+	onProjectFileDropped,
+}: EditorEmptyStateProps) {
 	const [isDraggingOver, setIsDraggingOver] = useState(false);
 
 	const handleImportVideo = useCallback(async () => {
@@ -60,10 +65,13 @@ export function EditorEmptyState({ onVideoImported, onProjectLoaded }: EditorEmp
 			if (!filePath) return;
 
 			const result = await nativeBridgeClient.project.loadProjectFileFromPath(filePath);
-			if (result.canceled || !result.success) return;
-			onProjectLoaded();
+			if (!result.success) return;
+
+			// Pass the already-loaded project data up so VideoEditor can apply it
+			// directly without re-opening a file picker dialog.
+			onProjectFileDropped(result.project, result.path ?? null);
 		},
-		[onProjectLoaded],
+		[onProjectFileDropped],
 	);
 
 	return (
@@ -93,10 +101,7 @@ export function EditorEmptyState({ onVideoImported, onProjectLoaded }: EditorEmp
 				<div className="flex flex-col gap-2">
 					<h2 className="text-xl font-semibold text-slate-200">No project open</h2>
 					<p className="max-w-sm text-sm leading-relaxed text-slate-500">
-						Import a video to start editing, or load an existing Openscreen project.
-						<br />
-						You can also drag and drop a <span className="text-slate-400">.openscreen</span> file
-						here.
+						Import a video to start editing, or load an existing OpenScreen project.
 					</p>
 				</div>
 
@@ -120,9 +125,18 @@ export function EditorEmptyState({ onVideoImported, onProjectLoaded }: EditorEmp
 					</button>
 				</div>
 
-				<p className="text-xs text-slate-600">
-					Supported formats: MP4, MOV, WebM, MKV, AVI, M4V, WMV
-				</p>
+				<div className="flex flex-col items-center gap-2">
+					<p className="text-xs text-slate-600">
+						Supported formats: MP4, MOV, WebM, MKV, AVI, M4V, WMV
+					</p>
+					<div className="flex items-center gap-1.5 text-xs text-slate-700">
+						<Upload className="h-3 w-3" />
+						<span>
+							or drag & drop a <span className="text-slate-500 font-medium">.openscreen</span>{" "}
+							project file here
+						</span>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
