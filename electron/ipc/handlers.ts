@@ -1895,6 +1895,8 @@ export function registerIpcHandlers(
 
 	function clearCurrentVideoPath(): ProjectPathResult {
 		currentVideoPath = null;
+		currentProjectPath = null;
+		setCurrentRecordingSessionState(null);
 		return { success: true };
 	}
 
