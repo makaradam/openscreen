@@ -1778,7 +1778,7 @@ export function registerIpcHandlers(
 				return { success: false, message: "Invalid file path" };
 			}
 			// Validate extension and readability
-			if (!filePath.endsWith(`.${PROJECT_FILE_EXTENSION}`)) {
+			if (path.extname(filePath).toLowerCase() !== `.${PROJECT_FILE_EXTENSION}`) {
 				return { success: false, message: "Not an Openscreen project file" };
 			}
 			const stats = await fs.stat(filePath).catch(() => null);
