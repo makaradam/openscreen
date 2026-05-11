@@ -6,6 +6,7 @@
 		"confirm": "確認"
 	},
 	"loadingVideo": "正在載入影片...",
+	"loadingEditor": "正在載入編輯器...",
 	"errors": {
 		"noVideoLoaded": "未載入影片",
 		"videoNotReady": "影片未就緒",

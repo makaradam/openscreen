@@ -36,6 +36,7 @@
 		"cameraNotFound": "Kamera bulunamadı."
 	},
 	"loadingVideo": "Video yükleniyor...",
+	"loadingEditor": "Editör yükleniyor...",
 	"newRecording": {
 		"title": "Kaydediciye Dön",
 		"description": "Mevcut oturumunuz kaydedildi.",

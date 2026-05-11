@@ -6,6 +6,7 @@
 		"confirm": "Confirm"
 	},
 	"loadingVideo": "Loading video...",
+	"loadingEditor": "Loading editor...",
 	"errors": {
 		"noVideoLoaded": "No video loaded",
 		"videoNotReady": "Video not ready",

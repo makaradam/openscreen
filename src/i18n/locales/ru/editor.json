@@ -6,6 +6,7 @@
 		"confirm": "Подтвердить"
 	},
 	"loadingVideo": "Загрузка видео...",
+	"loadingEditor": "Загрузка редактора...",
 	"errors": {
 		"noVideoLoaded": "Видео не загружено",
 		"videoNotReady": "Видео не готово",

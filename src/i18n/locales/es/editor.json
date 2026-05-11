@@ -36,6 +36,7 @@
 		"permissionDenied": "Permiso de grabación denegado. Por favor permite la grabación de pantalla."
 	},
 	"loadingVideo": "Cargando video...",
+	"loadingEditor": "Cargando editor...",
 	"newRecording": {
 		"title": "Volver a la grabadora",
 		"description": "Tu sesión actual ha sido guardada.",

@@ -183,6 +183,9 @@ export default function VideoEditor() {
 	const [webcamVideoSourcePath, setWebcamVideoSourcePath] = useState<string | null>(null);
 	const [currentProjectPath, setCurrentProjectPath] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [loadingMessage, setLoadingMessage] = useState<"loadingEditor" | "loadingVideo">(
+		"loadingEditor",
+	);
 	const [error, setError] = useState<string | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
@@ -476,6 +479,7 @@ export default function VideoEditor() {
 				const currentSessionResult = await window.electronAPI.getCurrentRecordingSession();
 				if (currentSessionResult.success && currentSessionResult.session) {
 					const session = currentSessionResult.session;
+					setLoadingMessage("loadingVideo");
 					const sourcePath = fromFileUrl(session.screenVideoPath);
 					const webcamSourcePath = session.webcamVideoPath
 						? fromFileUrl(session.webcamVideoPath)
@@ -503,6 +507,7 @@ export default function VideoEditor() {
 
 				const result = await nativeBridgeClient.project.getCurrentVideoPath();
 				if (result.success && result.path) {
+					setLoadingMessage("loadingVideo");
 					setVideoSourcePath(result.path);
 					setVideoPath(toFileUrl(result.path));
 					setRecordingCursorCaptureMode(null);
@@ -2030,7 +2035,7 @@ export default function VideoEditor() {
 						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
 					/>
 				</svg>
-				<span className="text-white/50 text-sm">{t("loadingVideo")}</span>
+				<span className="text-white/50 text-sm">{t(loadingMessage)}</span>
 			</div>
 		);
 	}

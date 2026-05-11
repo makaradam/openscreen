@@ -6,6 +6,7 @@
 		"confirm": "تأكيد"
 	},
 	"loadingVideo": "جاري تحميل الفيديو...",
+	"loadingEditor": "جارٍ تحميل المحرر...",
 	"errors": {
 		"noVideoLoaded": "لم يتم تحميل أي فيديو",
 		"videoNotReady": "الفيديو غير جاهز",

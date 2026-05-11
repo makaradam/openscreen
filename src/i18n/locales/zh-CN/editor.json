@@ -6,6 +6,7 @@
 		"confirm": "确认"
 	},
 	"loadingVideo": "正在加载视频...",
+	"loadingEditor": "正在加载编辑器...",
 	"errors": {
 		"noVideoLoaded": "未加载视频",
 		"videoNotReady": "视频未就绪",
