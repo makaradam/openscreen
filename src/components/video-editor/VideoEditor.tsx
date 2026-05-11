@@ -220,6 +220,13 @@ export default function VideoEditor() {
 	const [confirmDialogVariant, setConfirmDialogVariant] = useState<"close" | "newProject" | null>(
 		null,
 	);
+	// Keeps the last non-null variant so the dialog content doesn't snap to the
+	// "close" fallback during the closing animation (which would briefly flash
+	// "Save & Close / Discard & Close" and fire a spurious sendCloseConfirmResponse).
+	const lastConfirmVariantRef = useRef<"close" | "newProject">("close");
+	if (confirmDialogVariant !== null) {
+		lastConfirmVariantRef.current = confirmDialogVariant;
+	}
 	const playerContainerRef = useRef<HTMLDivElement | null>(null);
 	const cursorTelemetrySourcePath = videoSourcePath ?? (videoPath ? fromFileUrl(videoPath) : null);
 	const { samples: cursorTelemetry, error: cursorTelemetryError } =
@@ -2511,19 +2518,19 @@ export default function VideoEditor() {
 
 			<UnsavedChangesDialog
 				isOpen={confirmDialogVariant !== null}
-				variant={confirmDialogVariant ?? "close"}
+				variant={lastConfirmVariantRef.current}
 				onSaveAndClose={
-					confirmDialogVariant === "newProject"
+					lastConfirmVariantRef.current === "newProject"
 						? handleNewProjectConfirmSave
 						: handleCloseConfirmSave
 				}
 				onDiscardAndClose={
-					confirmDialogVariant === "newProject"
+					lastConfirmVariantRef.current === "newProject"
 						? handleNewProjectConfirmDiscard
 						: handleCloseConfirmDiscard
 				}
 				onCancel={
-					confirmDialogVariant === "newProject"
+					lastConfirmVariantRef.current === "newProject"
 						? () => setConfirmDialogVariant(null)
 						: handleCloseConfirmCancel
 				}
